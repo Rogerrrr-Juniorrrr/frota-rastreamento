@@ -1,0 +1,24 @@
+nome_instalador,cidade_base,uf,empresa_credenciada,total_ordens_servico,qtd_instalados,qtd_pendentes,qtd_removidos,valor_total_repassado,qtd_em_transito,qtd_entregues,media_dias_transporte
+OFICINA CENTRAL,Cascavel,PR,,27,22,2,3,4050,0,24,8.5
+AUTO ELÉTRICA SANTOS,Ribeirão Pires,SP,,25,25,0,0,3150,3,22,8.3
+MECÂNICA RÁPIDO,Clevelândia,PR,AZIMUTE,22,19,3,0,1760,0,22,8.6
+OFICINA SANTOS,Imbaú,PR,,5,4,0,0,350,1,4,8.3
+MECÂNICA TOTAL,Cambé,PR,AZIMUTE,5,4,1,0,500,0,5,8.2
+OFICINA SUL,Ibaiti,PR,,4,4,0,0,280,0,4,8.5
+PARCEIRO NÃO VINCULADO,,,,4,3,0,1,,0,3,8.7
+ELETRO TOTAL,Irani,SC,AZIMUTE,3,3,0,0,270,0,3,9.3
+ELETRO NORTE,Curitiba,PR,AZIMUTE,3,3,0,0,270,3,0,
+TECH SUL,Vilhena,RO,,3,3,0,0,240,0,3,7.0
+MECÂNICA SUL,Londrina,PR,,2,2,0,0,180,0,2,8.0
+AUTO ELÉTRICA NORTE,Fraiburgo,SC,,2,2,0,0,320,0,2,8.5
+TECH SILVA,Campo Magro,PR,AZIMUTE,2,2,0,0,180,2,0,
+OFICINA SANTOS,Vitória Da Conquista,BA,AZIMUTE,2,2,0,0,160,0,2,9.0
+AUTO ELÉTRICA RÁPIDO,Sarandi,PR,,2,0,1,1,180,0,1,8.0
+AUTO ELÉTRICA RÁPIDO,Telêmaco Borba,PR,,2,2,0,0,280,0,2,9.0
+MECÂNICA SILVA,Paiçandu,PR,AZIMUTE,2,1,1,0,180,0,2,8.0
+ELETRO SANTOS,Figueira,PR,AZIMUTE,1,1,0,0,80,0,1,9.0
+OFICINA DO ALEMÃO,Pinhalão,PR,AZIMUTE,1,1,0,0,90,0,1,7.0
+CENTRO AUTOMOTIVO SUL,Xaxim,SC,,1,1,0,0,70,0,1,7.0
+TECH SUL,Carlos Barbosa,SC,,1,1,0,0,100,0,1,7.0
+TECH SANTOS,Japira,PR,AZIMUTE,1,1,0,0,90,0,1,7.0
+ELETRO RÁPIDO,Rolândia,PR,AZIMUTE,1,0,0,0,80,1,0,
