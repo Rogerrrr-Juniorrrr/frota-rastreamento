@@ -1,11 +1,13 @@
-# Frota Rastreamento - Data Warehouse
+# 🚛 Frota Rastreamento - Data Warehouse (ELT)
 
 ![Status](https://img.shields.io/badge/Status-Concluído-success)
 ![Technology](https://img.shields.io/badge/Tech-BigQuery%20%7C%20SQL%20%7C%20Looker%20Studio-blue)
 
+![Dashboard Preview](dashboard/ranking_de_eficiencia_da_rede_credenciada.png)
+
 ## 📌 Sobre o Projeto
 
-Este projeto consiste na construção de um **Data Warehouse ** completo para uma empresa de rastreamento veicular. O objetivo foi migrar o controle operacional, que antes era feito em planilhas dispersas, para uma arquitetura moderna em nuvem (**ELT**).
+Este projeto consiste na construção de um **Data Warehouse** completo para uma empresa de rastreamento veicular. O objetivo foi migrar o controle operacional, que antes era feito em planilhas dispersas, para uma arquitetura moderna em nuvem (**ELT**) integrada a um painel de Business Intelligence.
 
 O sistema centraliza dados de **contratos de associados**, **logística de envio de rastreadores** e **gestão de parceiros instaladores**, permitindo análises de eficiência, faturamento e gargalos operacionais.
 
@@ -20,13 +22,27 @@ O projeto segue a **Arquitetura Medalhão** (Bronze, Silver, Gold) dentro do Goo
 | Camada | Descrição |
 | :--- | :--- |
 | **🥉 Bronze** | Ingestão dos arquivos CSV brutos (`associados`, `frota`, `instaladores`). Dados originais sem tratamento. |
-| **🥈 Silver** | Limpeza, padronização e modelagem em **Star Schema** (Fatos e Dimensões). Criação de chaves substitutas (Hash). |
-| **🥇 Gold** | Tabelas agregadas e prontas para consumo em Dashboards (KPIs de Parceiros, Funil Logístico, Carteira). |
+| **🥈 Silver** | Limpeza, padronização e modelagem em **Star Schema** (Fatos e Dimensões). Criação de chaves substitutas (Hash) e tratamento de duplicidades. |
+| **🥇 Gold** | Tabelas agregadas e prontas para consumo no Looker Studio (KPIs de Parceiros, Funil Logístico, Carteira). |
+
+---
+
+## 📊 Dashboard e Visualização de Dados
+
+A camada Gold foi conectada ao **Google Looker Studio** para a criação de um dashboard executivo focado em tomada de decisão.
+
+**Principais Visões:**
+* **Ranking de Eficiência:** Análise de performance da rede credenciada (Instalados vs. Pendentes).
+* **Mapa de Calor Geográfico:** Identificação visual de gargalos logísticos por estado (UF).
+* **Funil Operacional:** Acompanhamento do ciclo de vida do rastreador (Envio > Entrega > Instalação).
+* **Auditoria de Custos:** Controle de valores pagos por instalação e ticket médio por parceiro.
 
 ---
 
 ## 🛠️ Tecnologias e Técnicas Utilizadas
 
+* **Google BigQuery:** Data Warehouse Serverless.
+* **Looker Studio:** Ferramenta de visualização e storytelling de dados.
 * **SQL (Dialeto BigQuery):**
     * **CTEs (Common Table Expressions):** Para modularizar a lógica e limpar o código.
     * **Window Functions (`QUALIFY ROW_NUMBER`):** Para deduplicação de registros e garantia de unicidade temporal.
@@ -61,6 +77,10 @@ O projeto segue a **Arquitetura Medalhão** (Bronze, Silver, Gold) dentro do Goo
 
 ```text
 /frota-rastreamento
+│
+├── /dashboard                   # 📊 Visualização Final (Novo)
+│   ├── dashboard_final.pdf      # Relatório completo em PDF
+│   └── dashboard_final.png      # Imagem para preview
 │
 ├── /data                        # Dados do Projeto (CSV)
 │   ├── /1_bronze                # Arquivos originais (Ingestão)
