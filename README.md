@@ -1,4 +1,4 @@
-# 🚛 Frota Rastreamento - Data Warehouse (ELT)
+# Frota Rastreamento - Data Warehouse (ELT)
 
 ![Status](https://img.shields.io/badge/Status-Concluído-success)
 ![Technology](https://img.shields.io/badge/Tech-BigQuery%20%7C%20SQL%20%7C%20Looker%20Studio-blue)
