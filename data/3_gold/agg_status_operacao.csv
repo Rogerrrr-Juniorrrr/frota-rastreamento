@@ -1,0 +1,16 @@
+uf_entrega,qtd_em_transito,qtd_estoque_parado,qtd_instalados,qtd_risco_termo,total_veiculos
+PR,38,25,164,6,313
+SP,40,18,127,4,232
+SC,40,13,96,4,188
+MG,14,7,42,3,81
+RS,25,12,41,3,108
+ES,16,6,36,2,64
+RJ,11,11,35,2,67
+MS,10,6,34,0,67
+MT,14,5,34,3,62
+GO,9,11,32,1,64
+BA,11,2,23,0,47
+PE,6,4,19,0,38
+RO,0,0,7,0,7
+DF,3,2,4,0,10
+CE,4,1,0,0,9

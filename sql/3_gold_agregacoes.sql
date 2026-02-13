@@ -2,7 +2,6 @@
 ------------------AGREGAÇÃO PERFIL CARTEIRA------------------
 -------------------------------------------------------------
 
-
 CREATE OR REPLACE TABLE tr_gold.agg_perfil_carteira AS
 SELECT
   -- Agrupamento Temporal
@@ -35,8 +34,6 @@ ORDER BY 1 DESC, 2, 5 DESC;
 -------------------------------------------------------------
 ------------------AGREGAÇÃO STATUS OPERAÇÃO------------------
 -------------------------------------------------------------
-
-
 
 CREATE OR REPLACE TABLE tr_gold.agg_status_operacao AS
 SELECT
@@ -85,7 +82,9 @@ SELECT
   
   -- KPIs de Status (Quantos ele concluiu vs deixou pendente)
   COUNTIF(f.status_instalacao = 'INSTALADO') AS qtd_instalados,
-  COUNTIF(f.status_instalacao = 'PENDENTE' AND f.status_envio = 'ENTREGUE') AS qtd_pendentes,
+  COUNTIF(f.status_instalacao = 'PENDENTE' 
+          AND f.status_envio = 'ENTREGUE' 
+          AND f.status_contrato IN ('ATIVO', 'ATIVO IRREGULAR')) AS qtd_pendentes,
   COUNTIF(f.status_instalacao = 'REMOVIDO') AS qtd_removidos,
   
   -- KPI Financeiro (Volume de Repasse)
@@ -93,10 +92,12 @@ SELECT
   SUM(f.valor_instalacao) AS valor_total_repassado,
   
   -- KPI de Eficiência (Status de Envio e Média de dias entre Envio e Entrega)
-  COUNTIF(f.status_envio IN ('N/A','ENVIADO')) AS qtd_em_transito,
-  COUNTIF(f.status_envio = 'ENTREGUE') AS qtd_entregues,
+  COUNTIF(f.status_envio = 'ENVIADO' AND f.status_instalacao = 'PENDENTE') AS qtd_em_transito,
+  COUNTIF(f.status_envio IN ('N/A', 'ENTREGUE')) AS qtd_entregues,
+
   -- Só calcula se tiver as duas datas preenchidas
-  ROUND(AVG(DATE_DIFF(f.data_entrega, f.data_envio, DAY)), 1) AS media_dias_transporte
+  ROUND(AVG(DATE_DIFF(f.data_entrega, f.data_envio, DAY)), 1) AS media_dias_transporte,
+  ROUND(AVG(DATE_DIFF(f.data_instalacao, f.data_entrega, DAY)), 1) AS media_dias_instalacao
 
 
 FROM tr_silver.fct_instalacoes f
@@ -107,7 +108,7 @@ WHERE f.id_instalador IS NOT NULL -- Ignora instalações sem técnico vinculado
   AND f.status_envio != 'PENDENTE' -- Ignora envios pendentes
   AND f.status_instalacao != 'JÁ POSSUI' -- Ignora que já possui rastreador
 GROUP BY 1, 2, 3, 4
-ORDER BY 5 DESC; -- Ordena por quem tem mais ordens de serviço
+ORDER BY 6 DESC; -- Ordena por quem tem mais ordens de serviço
 
 
 

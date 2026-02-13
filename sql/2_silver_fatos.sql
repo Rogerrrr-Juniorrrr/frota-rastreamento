@@ -2,7 +2,6 @@
 -----------------------FATO INSTALACOES-----------------------
 --------------------------------------------------------------
 
-
 CREATE OR REPLACE TABLE tr_silver.fct_instalacoes AS
 
   WITH ref_associados AS(
@@ -30,8 +29,8 @@ CREATE OR REPLACE TABLE tr_silver.fct_instalacoes AS
       
       TO_HEX(MD5(REPLACE(UPPER(TRIM(placa)), '-', ''))) AS id_veiculo_rbf, -- Necessário para o Join
 
-      -- FK Técnico/Auto Elétrica Disponível (Nome + Cidade = compatibilidade com a PK de dim_instaladores)
-      TO_HEX(MD5(CONCAT(UPPER(TRIM(auto_eletrica_compativel)), UPPER(TRIM(cidade))))) AS id_instalador,
+      -- FK (NOME) Técnico/Auto Elétrica Disponível
+      UPPER(TRIM(auto_eletrica_compativel)) AS nome_instalador_join,
 
       -- Limpeza do valor de instalação
       SAFE_CAST(
@@ -41,6 +40,7 @@ CREATE OR REPLACE TABLE tr_silver.fct_instalacoes AS
         -- DADOS OPERACIONAIS (Adicionados)
       PARSE_DATE('%d/%m/%Y', dt_envio) AS data_envio,
       PARSE_DATE('%d/%m/%Y', dt_entrega) AS data_entrega,
+      PARSE_DATE('%d/%m/%Y', dt_instalacao) AS data_instalacao,
       UPPER(TRIM(status_envio)) AS status_envio,       -- Ex: ENTREGUE, ENVIADO, PENDENTE
       UPPER(TRIM(status_instalacao)) AS status_instalacao, -- Ex: INSTALADO, PENDENTE
       UPPER(TRIM(termo_assinado)) AS termo_assinado,   -- Ex: SIM, NÃO
@@ -61,7 +61,7 @@ CREATE OR REPLACE TABLE tr_silver.fct_instalacoes AS
     ra.id_associado, -- FK (associado)
     ra.id_veiculo_ra AS id_veiculo, -- FK (veiculo)
     rbf.id_dispositivo, -- FK (dispositivo)
-    rbf.id_instalador, -- FK (Técnico/Auto Elétrica)
+    di.id_instalador,-- FK (Técnico/Auto Elétrica)
     
     -- Contrato & Financeiro
     ra.data_contrato,
@@ -73,8 +73,15 @@ CREATE OR REPLACE TABLE tr_silver.fct_instalacoes AS
     END AS valor_instalacao,
     
     -- Operação e Logística
-    rbf.data_envio,
-    rbf.data_entrega,
+    CASE WHEN rbf.data_envio IS NULL AND rbf.status_envio = 'N/A' 
+      THEN rbf.data_instalacao ELSE rbf.data_envio END AS data_envio, -- Se não teve envio (N/A), assume data da instalação
+  
+    CASE WHEN rbf.data_entrega IS NULL AND rbf.status_envio = 'N/A' 
+      THEN rbf.data_instalacao ELSE rbf.data_entrega END AS data_entrega, -- Se não teve entrega (N/A), assume data da instalação
+
+    CASE WHEN rbf.data_instalacao IS NULL AND rbf.status_instalacao LIKE '%JÁ POSSUI%' 
+      THEN ra.data_contrato ELSE rbf.data_instalacao END AS data_instalacao, -- Se já possuía rastreador, a "Instalação" é a data do contrato
+
     rbf.status_envio,
     rbf.status_instalacao,
     rbf.termo_assinado,
@@ -98,6 +105,6 @@ CREATE OR REPLACE TABLE tr_silver.fct_instalacoes AS
 
   -- Join CTE Frota com Instaladores (para buscar a TABELA DE PREÇOS)
   LEFT JOIN tr_silver.dim_instaladores di
-    ON di.id_instalador = rbf.id_instalador;
+    ON rbf.nome_instalador_join = di.nome_instalador;
 
 

@@ -1,4 +1,41 @@
 -------------------------------------------------------------
+--------------------DIMENSÃO INSTALADORES--------------------
+-------------------------------------------------------------
+
+CREATE OR REPLACE TABLE tr_silver.dim_instaladores AS
+  SELECT
+    -- Hash do Nome + Cidade (Criando ID)
+    TO_HEX(MD5(UPPER(TRIM(instalador)))) AS id_instalador,
+    
+    UPPER(TRIM(instalador)) AS nome_instalador,
+    INITCAP(TRIM(cidade)) AS cidade_base,
+    UPPER(TRIM(uf)) AS uf,
+    
+    REGEXP_REPLACE(telefone, r'[^0-9]', '') AS contato,
+    
+    -- Flags de Capacidade
+    IF(UPPER(TRIM(atende_pesados)) = 'SIM', TRUE, FALSE) AS atende_pesados,
+    
+    -- Valores da instalação: convertendo "R$ 90,00" para 90.00
+    SAFE_CAST(
+      REPLACE(REPLACE(REPLACE(valor_leves, 'R$', ''), '.', ''), ',', '.') 
+    AS NUMERIC) AS preco_padrao,
+
+    SAFE_CAST(
+      REPLACE(REPLACE(REPLACE(valor_pesados, 'R$', ''), '.', ''), ',', '.') 
+    AS NUMERIC) AS preco_pesados,
+
+    -- Se for SIM, grava 'AZIMUTE'. Se não, deixa NULL (espaço para outros parceiros futuros)
+    IF(UPPER(TRIM(parceiro_azimute)) = 'SIM', 'AZIMUTE', NULL) AS empresa_credenciada,
+    
+    CURRENT_TIMESTAMP() AS processed_at
+
+  FROM tr_bronze.instaladores
+  WHERE instalador IS NOT NULL
+QUALIFY ROW_NUMBER() OVER(PARTITION BY nome_instalador, cidade_base ORDER BY instalador) = 1;
+
+
+-------------------------------------------------------------
 ---------------------DIMENSÃO ASSOCIADOS---------------------
 -------------------------------------------------------------
 
@@ -59,7 +96,7 @@ CREATE OR REPLACE TABLE tr_silver.dim_veiculos AS(
     UPPER(TRIM(REPLACE(REPLACE(modelo, '-', ' '), '.', ' '))) AS modelo,   
     
     -- Dados Numéricos Seguros
-    SAFE_CAST(TRIM(ano_de_fabricacao) AS INT64) AS ano_fabricacao,
+    ano_de_fabricacao AS ano_fabricacao,
 
     SAFE_CAST(
       REPLACE(REPLACE(REPLACE(a.valor_fipe, 'R$', ''), '.', ''), ',', '.') 
@@ -117,41 +154,3 @@ CREATE OR REPLACE TABLE tr_silver.dim_dispositivos AS
 
   -- Deduplicação: Garante 1 linha por IMEI (pela última atualização de fabricante)
   QUALIFY ROW_NUMBER() OVER(PARTITION BY imei ORDER BY ingested_at DESC) = 1;
-
-
-
--------------------------------------------------------------
---------------------DIMENSÃO INSTALADORES--------------------
--------------------------------------------------------------
-
-CREATE OR REPLACE TABLE tr_silver.dim_instaladores AS
-  SELECT
-    -- Hash do Nome + Cidade (Criando ID)
-    TO_HEX(MD5(CONCAT(UPPER(TRIM(instalador)), UPPER(TRIM(cidade))))) AS id_instalador,
-    
-    UPPER(TRIM(instalador)) AS nome_instalador,
-    INITCAP(TRIM(cidade)) AS cidade_base,
-    UPPER(TRIM(uf)) AS uf,
-    
-    REGEXP_REPLACE(telefone, r'[^0-9]', '') AS contato,
-    
-    -- Flags de Capacidade
-    IF(UPPER(TRIM(atende_pesados)) = 'SIM', TRUE, FALSE) AS atende_pesados,
-    
-    -- Valores da instalação: convertendo "R$ 90,00" para 90.00
-    SAFE_CAST(
-      REPLACE(REPLACE(REPLACE(valor_leves, 'R$', ''), '.', ''), ',', '.') 
-    AS NUMERIC) AS preco_padrao,
-
-    SAFE_CAST(
-      REPLACE(REPLACE(REPLACE(valor_pesados, 'R$', ''), '.', ''), ',', '.') 
-    AS NUMERIC) AS preco_pesados,
-
-    -- Se for SIM, grava 'AZIMUTE'. Se não, deixa NULL (espaço para outros parceiros futuros)
-    IF(UPPER(TRIM(parceiro_azimute)) = 'SIM', 'AZIMUTE', NULL) AS empresa_credenciada,
-    
-    CURRENT_TIMESTAMP() AS processed_at
-
-  FROM tr_bronze.instaladores
-  WHERE instalador IS NOT NULL
-QUALIFY ROW_NUMBER() OVER(PARTITION BY nome_instalador, cidade_base ORDER BY instalador) = 1;
